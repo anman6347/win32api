@@ -1,0 +1,8 @@
+// Resouce Script
+
+#include "resource.h"
+
+
+// Icon
+
+IDI_ICON0	ICON	DISCARDABLE		"main.ico"
