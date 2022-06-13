@@ -1,4 +1,5 @@
 // Resouce Script
+#pragma code_page(65001)
 
 #include "resource.h"
 
@@ -6,3 +7,16 @@
 // Icon
 
 IDI_ICON0	ICON	DISCARDABLE		"main.ico"
+
+
+// Menu
+
+WINMENU    MENU
+BEGIN
+    POPUP   "ファイル(&F)"
+    BEGIN
+        MENUITEM    "描く(&D)",     ID_DRAW
+        MENUITEM    "消す(&E)",     ID_ERASE
+        MENUITEM    "閉じる(&C)",   ID_CLOSE
+    END
+END

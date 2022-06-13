@@ -1,39 +1,79 @@
 #include <windows.h>
 #include "resource.h"
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
-    WCHAR testMsg[100];
-    static int count = 0;
+    LPCWSTR testMsg = L"左クリックで青、右クリックで赤の四角形を描画します";
+    HDC hdc;
+    RECT rc;
+    HANDLE hOldPen, hPen;
 
-    switch (uMessage) {
-    case WM_SHOWWINDOW:
-        SetTimer(hWnd, 1, 1000, NULL);
+    switch (message) {
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case ID_DRAW:
+            PostMessage(hWnd, WM_RBUTTONUP, 0, 0);
+            PostMessage(hWnd, WM_LBUTTONUP, 0, 0);
+            break;
+
+        case ID_ERASE:
+            InvalidateRect(hWnd, NULL, TRUE);
+            break;
+        
+        case ID_CLOSE:
+            DestroyWindow(hWnd);
+            break;
+
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
         break;
-
-    case WM_TIMER:
-        count++;
-        InvalidateRect(hWnd, NULL, TRUE);
 
     case WM_PAINT:
         BeginPaint(hWnd, &ps);
-        wsprintf(testMsg, L"%d 秒経過", count);
         TextOut(ps.hdc, 10, 20, testMsg, wcslen(testMsg));
         EndPaint(hWnd, &ps);
         break;
 
-    case WM_LBUTTONDOWN:
-        PostMessage(hWnd, (UINT)WM_DESTROY, (UINT)0, (LONG)0);
+    case WM_RBUTTONUP:
+        hdc = GetDC(hWnd);
+        GetClientRect(hWnd, &rc);  // ウィンドウサイズ取得
+
+        hPen = CreatePen(PS_SOLID, 1, (COLORREF)(RGB(255, 0, 0)));
+        hOldPen = SelectObject(hdc, hPen);  // 作成したペンを選択して保持
+
+        Rectangle(hdc, rc.left + 10, rc.top + 10,
+                        (rc.right / 2) - 10, (rc.bottom / 2) - 10);
+
+        SelectObject(hdc, hOldPen);
+        DeleteObject(hPen);
+
+        ReleaseDC(hWnd, hdc);
         break;
-    
+
+    case WM_LBUTTONUP:
+        hdc = GetDC(hWnd);
+        GetClientRect(hWnd, &rc);
+
+        hPen = CreatePen(PS_SOLID, 1, (COLORREF)(RGB(0, 0, 255)));
+        hOldPen = SelectObject(hdc, hPen);
+
+        Rectangle(hdc, (rc.right / 2) + 10, (rc.bottom / 2) + 10,
+                        rc.right - 10, rc.bottom - 10);
+
+        SelectObject(hdc, hOldPen);
+        DeleteObject(hPen);
+
+        ReleaseDC(hWnd, hdc);
+        break;
+
     case WM_DESTROY:
-        KillTimer(hWnd, 1);
         PostQuitMessage(0);
         break;
 
     default:
-        return DefWindowProc(hWnd, uMessage, wParam, lParam);
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
 }
@@ -59,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     wcx.hIconSm         = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON0));
     wcx.hCursor         = LoadCursor(NULL, IDC_ARROW);
     wcx.hbrBackground   = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wcx.lpszMenuName    = NULL;
+    wcx.lpszMenuName    = MAKEINTRESOURCE(WINMENU);
     wcx.lpszClassName   = szWindowClass;
 
     if (!RegisterClassEx(&wcx)) {
@@ -68,8 +108,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     hWnd = CreateWindow(szWindowClass, szTitle,
                         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                        CW_USEDEFAULT, CW_USEDEFAULT,
-                        400, 100,
+                        GetSystemMetrics(SM_CXSCREEN) / 2 - 500 / 2,
+                        GetSystemMetrics(SM_CYSCREEN) / 2 - 200 / 2,
+                        500, 200,
                         HWND_DESKTOP, NULL, hInstance, NULL);
 
     if (!hWnd) {
