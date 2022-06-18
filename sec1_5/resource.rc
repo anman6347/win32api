@@ -1,0 +1,25 @@
+// Resouce Script
+// UTF-8
+#pragma code_page(65001)
+
+#include "resource.h"
+#include <windows.h>
+
+
+// DIALOG
+
+MENU DIALOGEX 0, 0, 120, 47
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "進級結果"
+FONT 14, "HG行書体", 700, 0, 0x00
+BEGIN
+    EDITTEXT        IDC_COUNT, 73, 7, 42, 28, ES_MULTILINE| ES_WANTRETURN| ES_LEFT | ES_AUTOVSCROLL | NOT WS_TABSTOP
+    CTEXT           "進級結果", IDC_STATIC, 34, 14, 38, 14
+    PUSHBUTTON      "テスト", IDC_TEST, 0, 2, 35, 14
+    PUSHBUTTON      "閉じる", IDC_CLOSE, 0, 24, 35, 14
+END
+
+
+// Icon
+
+IDI_ICON0	ICON	DISCARDABLE		"main.ico"
