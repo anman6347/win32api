@@ -1,0 +1,23 @@
+// Resouce Script
+// UTF-8
+#pragma code_page(65001)
+
+#include "resource.h"
+
+
+// MENU
+WINMENU    MENU
+{
+    POPUP   "ファイル(&F)"
+    {
+        MENUITEM    "閉じる(&C)",   ID_CLOSE
+    }
+}
+
+
+// Icon
+IDI_ICON0	ICON	DISCARDABLE		"main.ico"
+
+// Cursor
+IDC_CURSOR0 ANICURSOR  "anman.ani"
+
